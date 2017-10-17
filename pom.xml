@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <build>
-        <finalName>CampusLiveStudent</finalName>
+        <finalName>CampusLiveAdmin</finalName>
         <plugins>
 
             <plugin>
