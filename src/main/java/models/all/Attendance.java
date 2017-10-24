@@ -4,16 +4,16 @@ import java.io.Serializable;
 
 public class Attendance implements Serializable {
 
-    private String aDate;
+    private String attendanceDate;
     private String attendance;
 
-    public Attendance(String aDate, String attendance) {
-        this.aDate = aDate;
+    public Attendance(String attendanceDate, String attendance) {
+        this.attendanceDate = attendanceDate;
         this.attendance = attendance;
     }
 
-    public String getDate() {
-        return aDate;
+    public String getAttendanceDate() {
+        return attendanceDate;
     }
 
     public String getAttendance() {

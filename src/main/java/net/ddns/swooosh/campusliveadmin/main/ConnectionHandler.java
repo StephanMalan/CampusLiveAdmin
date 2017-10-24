@@ -19,7 +19,7 @@ public class ConnectionHandler {
     private Socket socket;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
-    private List<String> inputQueue = new ArrayList<>();
+    private volatile List<String> inputQueue = new ArrayList<>();
     ObservableList<StudentClass> classes = FXCollections.observableArrayList();
     ObservableList<Admin> admins = FXCollections.observableArrayList();
     ObservableList<AdminSearch> studentSearches = FXCollections.observableArrayList();
@@ -38,10 +38,6 @@ public class ConnectionHandler {
     ConnectionHandler() {
         connect();
         new InputProcessor().start();
-        studentSearches.addAll(new AdminSearch("student", "Stephan Malan", "DV2015-0073"),
-                new AdminSearch("student", "Ronald Muller", "DV2015-0103"),
-                new AdminSearch("student", "Jaco Lintvelt", "DV2015-0135"));
-
     }
 
     private void connect() {
@@ -68,12 +64,30 @@ public class ConnectionHandler {
         sendData("asd:" + studentNumber);
     }
 
+    void requestLecturer(String lecturerNumber) {
+        sendData("ald:" + lecturerNumber);
+    }
+
     void unregisterClass(String studentNumber, int classID) {
         sendData("uc:" + studentNumber + ":" + classID);
     }
 
     void registerClass(String studentNumber, int classID) {
         sendData("rsc:" + studentNumber + ":" + classID);
+    }
+
+    void resetAdminPassword(String username, String email) {
+        sendData("rap:" + username + ":" + email);
+    }
+
+    public Boolean changeDefaultPassword(String newPassword) {
+        sendData("cdp:" + newPassword);
+        return getStringReply("cdp:");
+    }
+
+    public boolean isDefaultPassword() {
+        sendData("idp:");
+        return getStringReply("idp:");
     }
 
     private void sendData(String data) {
@@ -98,20 +112,22 @@ public class ConnectionHandler {
         return null;
     }
 
-    private Boolean getStringReply(String startsWith) {
+    private synchronized Boolean getStringReply(String startsWith) {
+        System.out.println(startsWith);
         Boolean result;
         String objectToRemove;
         ReturnResult:
         while (true) {
-            for (String in : inputQueue) {
-                if (in.startsWith(startsWith)) {
-                    objectToRemove = in;
-                    result = in.charAt(startsWith.length()) == 'y';
+            for (String anInputQueue : inputQueue) {
+                if (anInputQueue.startsWith(startsWith)) {
+                    objectToRemove = anInputQueue;
+                    result = anInputQueue.charAt(startsWith.length()) == 'y';
                     break ReturnResult;
                 }
             }
         }
         inputQueue.remove(objectToRemove);
+        System.out.println("Got reply> " + objectToRemove);
         return result;
     }
 

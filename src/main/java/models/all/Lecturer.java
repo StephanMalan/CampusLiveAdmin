@@ -52,12 +52,15 @@ public class Lecturer implements Serializable{
         try {
             return SwingFXUtils.toFXImage(ImageIO.read(new ByteArrayInputStream(imageBytes)), null);
         } catch (Exception ex) {
-            ex.printStackTrace();
         }
         return null;
     }
 
     public List<LecturerClass> getClasses() {
         return classes;
+    }
+
+    public String getLecturerDetails() {
+        return "First Name: " + firstName + "\nLast Name: " + lastName + "\nLecturer Number: " + lecturerNumber + "\nEmail: " + email + "\nContact Number: " + contactNumber;
     }
 }
