@@ -7,11 +7,14 @@ import models.all.ContactDetails;
 public class ContactDetailsObservable {
 
     ContactDetails contactDetails;
-    BooleanProperty updated = new SimpleBooleanProperty(false);
+    public BooleanProperty updated = new SimpleBooleanProperty(false);
 
     public void setContactDetails(ContactDetails contactDetails) {
         this.contactDetails = contactDetails;
         updated.set(true);
     }
 
+    public ContactDetails getContactDetails() {
+        return contactDetails;
+    }
 }

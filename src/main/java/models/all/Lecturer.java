@@ -56,6 +56,10 @@ public class Lecturer implements Serializable{
         return null;
     }
 
+    public byte[] getImageBytes() {
+        return imageBytes;
+    }
+
     public List<LecturerClass> getClasses() {
         return classes;
     }

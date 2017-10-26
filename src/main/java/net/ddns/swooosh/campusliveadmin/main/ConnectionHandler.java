@@ -15,7 +15,7 @@ import java.util.List;
 public class ConnectionHandler {
 
     private static final int PORT = 25760;
-    private static final String LOCAL_ADDRESS = "127.0.0.1";
+    private static final String LOCAL_ADDRESS = "10.0.0.4"; //TODO
     private Socket socket;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
@@ -68,6 +68,14 @@ public class ConnectionHandler {
         sendData("ald:" + lecturerNumber);
     }
 
+    void requestClass(String classID) {
+        sendData("acd:" + classID);
+    }
+
+    void requestContact(String name, String position) {
+        sendData("aci:" + name + ":" + position);
+    }
+
     void unregisterClass(String studentNumber, int classID) {
         sendData("uc:" + studentNumber + ":" + classID);
     }
@@ -80,6 +88,101 @@ public class ConnectionHandler {
         sendData("rap:" + username + ":" + email);
     }
 
+    void resetStudentPassword() {
+        sendData("rsp:" + student.getStudent().getStudentNumber() + ":" + student.getStudent().getEmail());
+    }
+
+    void resetLecturerPassword() {
+        sendData("rlp:" + lecturer.getLecturer().getLecturerNumber() + ":" + lecturer.getLecturer().getEmail());
+    }
+
+    void sendAdmin(Admin admin) {
+        sendData(admin);
+    }
+
+    void removeStudent() {
+        sendData("rs:" + student.getStudent().getStudentNumber());
+    }
+
+    void removeLecturer() {
+        sendData("rl:" + lecturer.getLecturer().getLecturerNumber());
+    }
+
+    void removeAttendance(int attendanceID) {
+        sendData("ra:" + attendanceID);
+    }
+
+    void removeClass() {
+        sendData("rc:" + studentClass.getStudentClass().getClassID());
+    }
+
+    void removeClassTime(int classTimeID) {
+        sendData("rct:" + classTimeID);
+    }
+
+    void removeContact() {
+        sendData("rd:" + contactDetails.getContactDetails().getId());
+    }
+
+    void removeNotice(int noticeID) {
+        sendData("rn:" + noticeID);
+    }
+
+    void removeNotification(int notificationID) {
+        sendData("rf" + notificationID);
+    }
+
+    void removeDate(int dateID) {
+        sendData("ri:" + dateID);
+    }
+
+    void sendStudent(Student student) {
+        sendData(student);
+    }
+
+    void sendAttendance(Attendance attendance) {
+        sendData(attendance);
+    }
+
+    void sendLecturer(Lecturer lecturer) {
+        sendData(lecturer);
+    }
+
+    void sendClassTime(ClassTime classTime) {
+        sendData(classTime);
+    }
+
+    void sendNotice(Notice notice) {
+        sendData(notice);
+    }
+
+    void sendNotification(Notification notification) {
+        sendData(notification);
+    }
+
+    void updateResult(Result result) {
+        sendData(result);
+    }
+
+    void sendDate(ImportantDate importantDate) {
+        sendData(importantDate);
+    }
+
+    void sendContact(ContactDetails contactDetails) {
+        sendData(contactDetails);
+    }
+    void sendStudentClass(StudentClass studentClass) {
+        sendData(studentClass);
+    }
+
+    void sendResultTemplate(ResultTemplate resultTemplate) {
+        sendData(resultTemplate);
+    }
+
+    void regSuppExam(String studentNumber, int classID) {
+        sendData("rse:" + studentNumber + ":" + classID);
+    }
+
     public Boolean changeDefaultPassword(String newPassword) {
         sendData("cdp:" + newPassword);
         return getStringReply("cdp:");
@@ -90,9 +193,9 @@ public class ConnectionHandler {
         return getStringReply("idp:");
     }
 
-    private void sendData(String data) {
+    private void sendData(Object data) {
         try {
-            objectOutputStream.writeUTF(data);
+            objectOutputStream.writeObject(data);
             objectOutputStream.flush();
             System.out.println("Sent data: " + data);
         } catch (Exception ex) {
@@ -118,14 +221,18 @@ public class ConnectionHandler {
         String objectToRemove;
         ReturnResult:
         while (true) {
-            for (String anInputQueue : inputQueue) {
-                if (anInputQueue.startsWith(startsWith)) {
-                    objectToRemove = anInputQueue;
-                    result = anInputQueue.charAt(startsWith.length()) == 'y';
-                    break ReturnResult;
+            for (int i = 0; i < inputQueue.size(); i++) {
+                try {
+                    if (inputQueue.get(i).startsWith(startsWith)) {
+                        objectToRemove = inputQueue.get(i);
+                        result = inputQueue.get(i).charAt(startsWith.length()) == 'y';
+                        break ReturnResult;
+                    }
+                } catch (Exception ex) {
                 }
             }
         }
+        //TODO investigate running mutiple times
         inputQueue.remove(objectToRemove);
         System.out.println("Got reply> " + objectToRemove);
         return result;

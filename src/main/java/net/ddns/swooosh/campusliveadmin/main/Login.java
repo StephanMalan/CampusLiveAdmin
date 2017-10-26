@@ -43,7 +43,6 @@ public class Login extends Application {
         loginButton.setOnAction(e -> {
             if (!usernameTextField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
                 if (connectionHandler.login(usernameTextField.getText(), passwordField.getText())) {
-                    System.out.println("Hello?");
                     loggedIn = true;
                     stage.close();
                 } else {
