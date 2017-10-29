@@ -49,7 +49,7 @@ public class AddEditLecturerDialog extends CustomDialogSkin{
         emailTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
         ContactNumberTextField contactNumberTextField = new ContactNumberTextField("Contact Number");
         List<byte[]> imageBytes = new ArrayList<>();
-        imageBytes.set(0, null);
+        imageBytes.add(0, null);
         Circle lecturerPicture = new Circle(30);
         lecturerPicture.setStroke(Color.BLACK);
         lecturerPicture.setStrokeWidth(2);
@@ -61,27 +61,33 @@ public class AddEditLecturerDialog extends CustomDialogSkin{
             fileChooser.getExtensionFilters().addAll(filterJPG);
             File file = fileChooser.showOpenDialog(null);
             try {
-                imageBytes.set(0, Files.readAllBytes(file.toPath()));
-                lecturerPicture.setFill(new ImagePattern(SwingFXUtils.toFXImage(ImageIO.read(new ByteArrayInputStream(imageBytes.get(0))), null)));
+                if (file != null) {
+                    imageBytes.set(0, Files.readAllBytes(file.toPath()));
+                    lecturerPicture.setFill(new ImagePattern(SwingFXUtils.toFXImage(ImageIO.read(new ByteArrayInputStream(imageBytes.get(0))), null)));
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
-        HBox changePicturePane = new HBox(lecturerPicture, changePictureButton);
+        Button removePictureButton = new Button("Remove Picture");
+        removePictureButton.setOnAction(e -> {
+            imageBytes.set(0, null);
+        });
+        HBox changePicturePane = new HBox(lecturerPicture, changePictureButton, removePictureButton);
         changePicturePane.setSpacing(15);
         Button actionButton = new Button();
         actionButton.setOnAction(e -> {
             if (lecturerNumberTextField.getText().matches("[A-Z]{2}[0-9]{3}")) {
                 if (!firstNameTextField.getText().isEmpty() && firstNameTextField.getText().matches("[a-zA-Z ]*")) {
                     if (!lastNameTextField.getText().isEmpty() && lastNameTextField.getText().matches("[a-zA-Z ]*")) {
-                        if (!emailTextField.getText().isEmpty() && emailTextField.getText().matches("^[a-z0-9](\\.?[a-z0-9]){5,}@gmail\\.com$")) {
-                            if (!contactNumberTextField.getText().isEmpty() && contactNumberTextField.getText().matches("[0-9 ]{12}")) {
+                        if (!emailTextField.getText().isEmpty() && Display.validEmail(emailTextField.getText())) {
+                            if (!contactNumberTextField.getNumber().isEmpty() && contactNumberTextField.getNumber().matches("[0-9 ]{12}")) {
                                 if (lecturer != null) {
-                                    if (!firstNameTextField.getText().equals(lecturer.getFirstName()) || !lastNameTextField.getText().equals(lecturer.getLastName()) || !emailTextField.getText().equals(lecturer.getEmail()) || contactNumberTextField.getText().equals(lecturer.getContactNumber()) || imagesDiffer(lecturer.getImageBytes(), imageBytes.get(0))) {
-                                        connectionHandler.sendLecturer(new Lecturer(firstNameTextField.getText(), lastNameTextField.getText(), lecturerNumberTextField.getText(), emailTextField.getText(), contactNumberTextField.getText(), imageBytes.get(0), null));
+                                    if (!firstNameTextField.getText().equals(lecturer.getFirstName()) || !lastNameTextField.getText().equals(lecturer.getLastName()) || !emailTextField.getText().equals(lecturer.getEmail()) || contactNumberTextField.getNumber().equals(lecturer.getContactNumber()) || imagesDiffer(lecturer.getImageBytes(), imageBytes.get(0))) {
+                                        connectionHandler.sendLecturer(new Lecturer(firstNameTextField.getText(), lastNameTextField.getText(), lecturerNumberTextField.getText(), emailTextField.getText(), contactNumberTextField.getNumber(), imageBytes.get(0), null));
                                     }
                                 } else {
-                                    connectionHandler.sendLecturer(new Lecturer(firstNameTextField.getText(), lastNameTextField.getText(), lecturerNumberTextField.getText(), emailTextField.getText(), contactNumberTextField.getText(), imageBytes.get(0), null));
+                                    connectionHandler.sendLecturer(new Lecturer(firstNameTextField.getText(), lastNameTextField.getText(), lecturerNumberTextField.getText(), emailTextField.getText(), contactNumberTextField.getNumber(), imageBytes.get(0), null));
                                 }
                                 closeAnimation();
                             } else {

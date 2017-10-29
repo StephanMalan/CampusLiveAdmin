@@ -1,5 +1,6 @@
 package net.ddns.swooosh.campusliveadmin.main;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import models.admin.*;
@@ -15,7 +16,7 @@ import java.util.List;
 public class ConnectionHandler {
 
     private static final int PORT = 25760;
-    private static final String LOCAL_ADDRESS = "10.0.0.4"; //TODO
+    private static final String LOCAL_ADDRESS = "127.0.0.1"; //TODO
     private Socket socket;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
@@ -129,11 +130,15 @@ public class ConnectionHandler {
     }
 
     void removeNotification(int notificationID) {
-        sendData("rf" + notificationID);
+        sendData("rf:" + notificationID);
     }
 
     void removeDate(int dateID) {
         sendData("ri:" + dateID);
+    }
+
+    void removeAdmin(String username) {
+        sendData("rm" + username);
     }
 
     void sendStudent(Student student) {
@@ -171,11 +176,12 @@ public class ConnectionHandler {
     void sendContact(ContactDetails contactDetails) {
         sendData(contactDetails);
     }
+
     void sendStudentClass(StudentClass studentClass) {
         sendData(studentClass);
     }
 
-    void sendResultTemplate(ResultTemplate resultTemplate) {
+    void sendResultTemplates(List<ResultTemplate> resultTemplate) {
         sendData(resultTemplate);
     }
 
@@ -232,7 +238,7 @@ public class ConnectionHandler {
                 }
             }
         }
-        //TODO investigate running mutiple times
+        //TODO investigate running multiple times
         inputQueue.remove(objectToRemove);
         System.out.println("Got reply> " + objectToRemove);
         return result;
@@ -249,6 +255,7 @@ public class ConnectionHandler {
             }
         }
         return classes;
+        //TODO will fuck out if classes.length == 0
     }
 
     void requestLogFile() {
@@ -266,6 +273,7 @@ public class ConnectionHandler {
                     } else if (input instanceof Lecturer) {
                         lecturer.setLecturer((Lecturer) input);
                     } else if (input instanceof StudentClass) {
+                        System.out.println("lel");
                         studentClass.setStudentClass((StudentClass) input);
                     } else if (input instanceof ContactDetails) {
                         contactDetails.setContactDetails((ContactDetails) input);
@@ -280,10 +288,12 @@ public class ConnectionHandler {
                                     studentSearches.addAll(list);
                                 }
                             } else if (((AdminSearch) list.get(0)).getType().equals("Lecturer")) {
-                                lecturerSearches.clear();
-                                if (!((AdminSearch) list.get(0)).getPrimaryText().equals("")) {
-                                    lecturerSearches.addAll(list);
-                                }
+                                Platform.runLater(() -> {
+                                    lecturerSearches.clear();
+                                    if (!((AdminSearch) list.get(0)).getPrimaryText().equals("")) {
+                                        lecturerSearches.addAll(list);
+                                    }
+                                });
                             } else if (((AdminSearch) list.get(0)).getType().equals("Class")) {
                                 classSearches.clear();
                                 if (!((AdminSearch) list.get(0)).getPrimaryText().equals("")) {
@@ -305,6 +315,7 @@ public class ConnectionHandler {
                             notifications.clear();
                             notifications.addAll(list);
                         } else if (!list.isEmpty() && list.get(0) instanceof ImportantDate) {
+                            System.out.println(1);
                             importantDates.clear();
                             importantDates.addAll(list);
                         } else if (!list.isEmpty() && list.get(0) instanceof StudentClass) {

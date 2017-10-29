@@ -27,6 +27,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import models.admin.Admin;
 import models.all.*;
+import org.apache.commons.validator.routines.EmailValidator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,19 +40,6 @@ public class Display extends Application {
     private ConnectionHandler connectionHandler = new ConnectionHandler();
 
     public void start(Stage stage) throws Exception {
-
-        //<editor-fold desc="Login">
-        Login login = new Login(connectionHandler);
-        try {
-            login.start(new Stage());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        if (!login.loggedIn) {
-            System.exit(0);
-        }
-        //</editor-fold>
-
         //<editor-fold desc="Stage">
         //Setup stage
         stage.setMaximized(true);
@@ -89,12 +77,17 @@ public class Display extends Application {
                 new AddEditAdminDialog(stage, adminTableView.getSelectionModel().getSelectedItem(), connectionHandler).showDialog();
             }
         });
+        Button removeAdminButton = new Button("Remove");
+        removeAdminButton.setOnAction(e -> {
+            if (!adminTableView.getSelectionModel().isEmpty()) {
+                connectionHandler.removeAdmin(adminTableView.getSelectionModel().getSelectedItem().getAdminName());
+            }
+        });
         Button resetPasswordButton = new Button("Reset Password");
         resetPasswordButton.setOnAction(e -> {
             if (!adminTableView.getSelectionModel().isEmpty()) {
                 connectionHandler.resetAdminPassword(adminTableView.getSelectionModel().getSelectedItem().getAdminName(), adminTableView.getSelectionModel().getSelectedItem().getAdminEmail());
             }
-
         });
         HBox adminButtonPane = new HBox(addAdminButton, editAdminButton, resetPasswordButton);
         adminButtonPane.setSpacing(10);
@@ -170,14 +163,14 @@ public class Display extends Application {
         });
         Button addClassButton = new Button("Add");
         addClassButton.setOnAction(e -> {
-            if (!studentSearchPane.searchListView.getSelectionModel().isEmpty()) {
-                new AddClassDialog(stage, connectionHandler, studentSearchPane.searchListView.getSelectionModel().getSelectedItem().getSecondaryText(), studentClassListView.getItems()).showDialog();
+            if (connectionHandler.student.getStudent() != null) {
+                new AddClassDialog(stage, connectionHandler, connectionHandler.student.getStudent().getStudentNumber(), studentClassListView.getItems()).showDialog();
             }
         });
         Button removeStudentClassButton = new Button("Remove");
         removeStudentClassButton.setOnAction(e -> {
             if (!studentClassListView.getSelectionModel().isEmpty()) {
-                connectionHandler.unregisterClass(studentSearchPane.searchListView.getSelectionModel().getSelectedItem().getSecondaryText(), studentClassListView.getSelectionModel().getSelectedItem().getStudentClass().getClassID());
+                connectionHandler.unregisterClass(connectionHandler.student.getStudent().getStudentNumber(), studentClassListView.getSelectionModel().getSelectedItem().getStudentClass().getClassID());
             }
         });
         HBox studentClassButtonPane = new HBox(addClassButton, removeStudentClassButton);
@@ -218,8 +211,8 @@ public class Display extends Application {
         });
         Button regSuppExamButton = new Button("Reg Supp Exam");
         regSuppExamButton.setOnAction(e -> {
-            if (!studentClassListView.getSelectionModel().isEmpty()) {
-                connectionHandler.regSuppExam(studentResultTableView.getSelectionModel().getSelectedItem().getStudentNumber(), connectionHandler.studentClass.getStudentClass().getClassID());
+            if (connectionHandler.student.getStudent() != null && !studentClassListView.getSelectionModel().isEmpty()) {
+                connectionHandler.regSuppExam(connectionHandler.student.getStudent().getStudentNumber(), studentClassListView.getSelectionModel().getSelectedItem().getStudentClass().getClassID());
             }
         });
         HBox studentResultButtonPane = new HBox(editResultButton, regSuppExamButton);
@@ -262,7 +255,7 @@ public class Display extends Application {
         Button editAttendanceButton = new Button("Edit");
         editAttendanceButton.setOnAction(e -> {
             if (!studentAttendanceTableView.getSelectionModel().isEmpty()) {
-                new EditAttendanceDialog(stage, connectionHandler, studentAttendanceTableView.getSelectionModel().getSelectedItem());
+                new EditAttendanceDialog(stage, connectionHandler, studentAttendanceTableView.getSelectionModel().getSelectedItem()).showDialog();
             }
         });
         Button removeAttendanceButton = new Button("Remove");
@@ -423,7 +416,7 @@ public class Display extends Application {
             }
         });
         classSearchPane.addNewButton.setOnAction(e -> {
-            //TODO
+            new AddEditClassDialog(stage, connectionHandler, null).showDialog();
         });
 
         TextArea classInfoTextArea = new TextArea("Please select class");
@@ -431,7 +424,9 @@ public class Display extends Application {
 
         Button editClassButton = new Button("Edit Details");
         editClassButton.setOnAction(e -> {
-            //TODO
+            if (connectionHandler.studentClass.getStudentClass() != null) {
+                new AddEditClassDialog(stage, connectionHandler, connectionHandler.studentClass.getStudentClass()).showDialog();
+            }
         });
         Button removeClassButton = new Button("Remove");
         removeClassButton.setOnAction(e -> {
@@ -510,8 +505,9 @@ public class Display extends Application {
         classResultTemplateTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         Button editResultTemplateButton = new Button("Edit");
         editResultTemplateButton.setOnAction(e -> {
-            //TODO
-
+            if (connectionHandler.studentClass.getStudentClass() != null) {
+                new EditResultTemplateDialog(stage, connectionHandler, connectionHandler.studentClass.getStudentClass().getResultTemplates()).showDialog();
+            }
         });
         HBox classResultTemplateButtonPane = new HBox(editResultTemplateButton);
         classResultTemplateButtonPane.setSpacing(10);
@@ -543,8 +539,8 @@ public class Display extends Application {
                     } else {
                         classInfoTextArea.setText("Please select class");
                     }
-                    connectionHandler.studentClass.updated.set(false);
                 });
+                connectionHandler.studentClass.updated.set(false);
             }
         });
         //</editor-fold>
@@ -681,7 +677,7 @@ public class Display extends Application {
         TableColumn<Notification, String> notificationTagTableColumn = new TableColumn<>("Tag");
         notificationTagTableColumn.setCellValueFactory(new PropertyValueFactory<>("tag"));
         notificationTableView.getColumns().addAll(notificationIDTableColumn, notificationHeadingTableColumn, notificationDescriptionTableColumn, notificationTagTableColumn);
-        connectionHandler.notices.addListener((InvalidationListener) e -> {
+        connectionHandler.notifications.addListener((InvalidationListener) e -> {
             notificationTableView.setItems(connectionHandler.notifications);
         });
         Button addNotificationButton = new Button("Add");
@@ -724,8 +720,11 @@ public class Display extends Application {
         descriptionTableColumn.prefWidthProperty().bind(datesTableView.widthProperty().multiply(0.8).subtract(2));
         descriptionTableColumn.setResizable(false);
         datesTableView.getColumns().addAll(dateTableColumn, descriptionTableColumn);
+        System.out.println(2);
         connectionHandler.importantDates.addListener((InvalidationListener) e -> {
-            datesTableView.setItems(connectionHandler.importantDates);
+            Platform.runLater(() -> {
+                datesTableView.setItems(connectionHandler.importantDates);
+            });
         });
         Button addDateButton = new Button("Add");
         addDateButton.setOnAction(e -> {
@@ -871,6 +870,18 @@ public class Display extends Application {
         scene.getStylesheets().add(getClass().getClassLoader().getResource("CampusLiveStyle.css").toExternalForm());
         //</editor-fold>
 
+        //<editor-fold desc="Login">
+        Login login = new Login(connectionHandler);
+        try {
+            login.start(new Stage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        if (!login.loggedIn) {
+            System.exit(0);
+        }
+        //</editor-fold>
+
         //<editor-fold desc="Start Stage">
         //Select and show scene
         stage.setScene(scene);
@@ -882,6 +893,16 @@ public class Display extends Application {
             new ChangePasswordDialog(stage, connectionHandler).showDialog();
         }
         //</editor-fold>
+    }
+
+    public static Boolean validEmail(String email) {
+        try {
+            EmailValidator.getInstance(false).isValid(email);
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     public static void main(String[] args) {

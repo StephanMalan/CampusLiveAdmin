@@ -43,14 +43,14 @@ public class AddEditContactDialog extends CustomDialogSkin {
         TextField positionTextField = new TextField();
         positionTextField.setPromptText("Position");
         positionTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
-        ComboBox<String> departmentComboBox = new ComboBox<>(FXCollections.observableArrayList("BSc IT", "BCom"));
+        ComboBox<String> departmentComboBox = new ComboBox<>(FXCollections.observableArrayList("Campus", "BSc IT", "BCom"));
         departmentComboBox.setPromptText("Department");
         ContactNumberTextField contactNumberTextField = new ContactNumberTextField("Contact Number");
         TextField emailTextField = new TextField();
         emailTextField.setPromptText("Email");
         emailTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
         List<byte[]> imageBytes = new ArrayList<>();
-        imageBytes.set(0, null);
+        imageBytes.add(0, null);
         Circle contactPicture = new Circle(30);
         contactPicture.setStroke(Color.BLACK);
         contactPicture.setStrokeWidth(2);
@@ -62,43 +62,49 @@ public class AddEditContactDialog extends CustomDialogSkin {
             fileChooser.getExtensionFilters().addAll(filterJPG);
             File file = fileChooser.showOpenDialog(null);
             try {
-                imageBytes.set(0, Files.readAllBytes(file.toPath()));
-                contactPicture.setFill(new ImagePattern(SwingFXUtils.toFXImage(ImageIO.read(new ByteArrayInputStream(imageBytes.get(0))), null)));
+                if (file != null) {
+                    imageBytes.set(0, Files.readAllBytes(file.toPath()));
+                    contactPicture.setFill(new ImagePattern(SwingFXUtils.toFXImage(ImageIO.read(new ByteArrayInputStream(imageBytes.get(0))), null)));
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
-        HBox changePicturePane = new HBox(contactPicture, changePictureButton);
+        Button removePictureButton = new Button("Remove Picture");
+        removePictureButton.setOnAction(e -> {
+            imageBytes.set(0, null);
+        });
+        HBox changePicturePane = new HBox(contactPicture, changePictureButton, removePictureButton);
         changePicturePane.setSpacing(15);
         Button actionButton = new Button();
         actionButton.setOnAction(e -> {
             if (!nameTextField.getText().isEmpty()) {
                 if (!positionTextField.getText().isEmpty()) {
                     if (!departmentComboBox.getSelectionModel().isEmpty()) {
-                        if (!emailTextField.getText().isEmpty() && emailTextField.getText().matches("^[a-z0-9](\\.?[a-z0-9]){5,}@gmail\\.com$")) {
-                            if (!contactNumberTextField.getText().isEmpty() && contactNumberTextField.getText().matches("[0-9 ]{12}")) {
+                        if (!emailTextField.getText().isEmpty() && Display.validEmail(emailTextField.getText())) {
+                            if (!contactNumberTextField.getNumber().isEmpty() && contactNumberTextField.getNumber().matches("[0-9 ]{12}")) {
                                 if (contactDetails != null) {
-                                    if (!nameTextField.getText().equals(contactDetails.getName()) || !positionTextField.getText().equals(contactDetails.getPosition()) || !departmentComboBox.getSelectionModel().getSelectedItem().equals(contactDetails.getDepartment()) || contactNumberTextField.getText().equals(contactDetails.getContactNumber()) || !emailTextField.getText().equals(contactDetails.getContactDetails()) || imagesDiffer(contactDetails.getImageBytes(), imageBytes.get(0))) {
-                                        connectionHandler.sendContact(new ContactDetails(contactDetails.getId(), nameTextField.getText(), positionTextField.getText(), departmentComboBox.getSelectionModel().getSelectedItem(), contactNumberTextField.getText(), emailTextField.getText(), imageBytes.get(0)));
+                                    if (!nameTextField.getText().equals(contactDetails.getName()) || !positionTextField.getText().equals(contactDetails.getPosition()) || !departmentComboBox.getSelectionModel().getSelectedItem().equals(contactDetails.getDepartment()) || contactNumberTextField.getNumber().equals(contactDetails.getContactNumber()) || !emailTextField.getText().equals(contactDetails.getContactDetails()) || imagesDiffer(contactDetails.getImageBytes(), imageBytes.get(0))) {
+                                        connectionHandler.sendContact(new ContactDetails(contactDetails.getId(), nameTextField.getText(), positionTextField.getText(), departmentComboBox.getSelectionModel().getSelectedItem(), contactNumberTextField.getNumber(), emailTextField.getText(), imageBytes.get(0)));
                                     }
                                 } else {
-                                    connectionHandler.sendContact(new ContactDetails(-1, nameTextField.getText(), positionTextField.getText(), departmentComboBox.getSelectionModel().getSelectedItem(), contactNumberTextField.getText(), emailTextField.getText(), imageBytes.get(0)));
+                                    connectionHandler.sendContact(new ContactDetails(-1, nameTextField.getText(), positionTextField.getText(), departmentComboBox.getSelectionModel().getSelectedItem(), contactNumberTextField.getNumber(), emailTextField.getText(), imageBytes.get(0)));
                                 }
                                 closeAnimation();
                             } else {
-                                UserNotification.showErrorMessage(heading, "Invalid email");
+                                UserNotification.showErrorMessage(heading, "Invalid contact number");
                             }
                         } else {
                             UserNotification.showErrorMessage(heading, "Invalid email");
                         }
                     } else {
-                        UserNotification.showErrorMessage(heading, "Invalid last name");
+                        UserNotification.showErrorMessage(heading, "Please select department");
                     }
                 } else {
-                    UserNotification.showErrorMessage(heading, "Invalid first name");
+                    UserNotification.showErrorMessage(heading, "Invalid position");
                 }
             } else {
-                UserNotification.showErrorMessage(heading, "Invalid lecturer number");
+                UserNotification.showErrorMessage(heading, "Invalid name");
             }
 
         });

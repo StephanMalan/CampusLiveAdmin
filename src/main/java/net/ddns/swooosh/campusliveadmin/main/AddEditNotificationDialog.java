@@ -28,7 +28,7 @@ public class AddEditNotificationDialog extends CustomDialogSkin {
         descriptionTextField.setPromptText("Description");
         descriptionTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
         TextField tagTextField = new TextField();
-        tagTextField.setPromptText("Last Name");
+        tagTextField.setPromptText("Tag");
         tagTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
         Button actionButton = new Button();
         actionButton.setOnAction(e -> {

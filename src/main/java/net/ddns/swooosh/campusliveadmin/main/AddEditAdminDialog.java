@@ -30,7 +30,7 @@ public class AddEditAdminDialog extends CustomDialogSkin{
         Button actionButton = new Button();
         actionButton.setOnAction(e -> {
             if (usernameTextField.getText().length() >= 5 && usernameTextField.getText().matches("[a-zA-Z0-9]*")) {
-                if (!emailTextField.getText().isEmpty() && emailTextField.getText().matches("^[a-z0-9](\\.?[a-z0-9]){5,}@gmail\\.com$")) {
+                if (!emailTextField.getText().isEmpty() && Display.validEmail(emailTextField.getText())) {
                     Admin newAdmin = new Admin(usernameTextField.getText(), emailTextField.getText());
                     if (admin != null) {
                         if (!admin.getAdminName().equals(newAdmin.getAdminName()) || !admin.getAdminEmail().equals(newAdmin.getAdminEmail()))

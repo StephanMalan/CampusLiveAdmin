@@ -43,6 +43,11 @@ public class ContactNumberTextField extends TextField {
         });
     }
 
+    public String getNumber() {
+        if (getText().length() > 12) return getText().substring(0, 12);
+        return getText();
+    }
+
     private String digitsOnly(String in) {
         String out = "";
         if (in != null) {

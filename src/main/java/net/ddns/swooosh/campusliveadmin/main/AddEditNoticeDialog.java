@@ -15,12 +15,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class AddEditNoticeDialog extends CustomDialogSkin {
 
     public AddEditNoticeDialog(Window parent, ConnectionHandler connectionHandler, Notice notice) {
         initOwner(parent);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy - MM - dd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String heading;
         if (notice != null) {
             heading = "Edit Notice";
@@ -46,11 +48,11 @@ public class AddEditNoticeDialog extends CustomDialogSkin {
                     if (!tagTextField.getText().isEmpty()) {
                         if (expiryDatePicker.getValue() != null && expiryDatePicker.getValue().isAfter(LocalDate.now())) {
                             if (notice != null) {
-                                if (!notice.getHeading().equals(headingTextField.getText()) || !notice.getDescription().equals(descriptionTextField.getText()) || !notice.getTag().equals(tagTextField.getText()) || !notice.getExpiryDate().equals(dateFormat.format(expiryDatePicker.getValue()))) {
-                                    connectionHandler.sendNotice(new Notice(notice.getId(), headingTextField.getText(), descriptionTextField.getText(), tagTextField.getText(), dateFormat.format(expiryDatePicker.getValue())));
+                                if (!notice.getHeading().equals(headingTextField.getText()) || !notice.getDescription().equals(descriptionTextField.getText()) || !notice.getTag().equals(tagTextField.getText()) || !notice.getExpiryDate().equals(expiryDatePicker.getValue().format(dateTimeFormatter))) {
+                                    connectionHandler.sendNotice(new Notice(notice.getId(), headingTextField.getText(), descriptionTextField.getText(), tagTextField.getText(), expiryDatePicker.getValue().format(dateTimeFormatter)));
                                 }
                             } else {
-                                connectionHandler.sendNotice(new Notice(-1, headingTextField.getText(), descriptionTextField.getText(), tagTextField.getText(), dateFormat.format(expiryDatePicker.getValue())));
+                                connectionHandler.sendNotice(new Notice(-1, headingTextField.getText(), descriptionTextField.getText(), tagTextField.getText(), expiryDatePicker.getValue().format(dateTimeFormatter)));
                             }
                             closeAnimation();
                         } else {
@@ -73,7 +75,7 @@ public class AddEditNoticeDialog extends CustomDialogSkin {
         buttonPane.setSpacing(15);
         if (notice != null) {
             actionButton.setText("Edit");
-            headingText.setText(notice.getHeading());
+            headingTextField.setText(notice.getHeading());
             descriptionTextField.setText(notice.getDescription());
             tagTextField.setText(notice.getTag());
             try {

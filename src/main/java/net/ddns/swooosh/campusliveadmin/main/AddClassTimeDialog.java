@@ -30,6 +30,7 @@ public class AddClassTimeDialog extends CustomDialogSkin {
         endSlotComboBox.setPromptText("End Time Slot");
         HBox selectPane = new HBox(startSlotComboBox, endSlotComboBox);
         selectPane.setSpacing(15);
+        selectPane.setAlignment(Pos.CENTER);
         Button actionButton = new Button("Edit");
         actionButton.setOnAction(e -> {
             if (!roomNumberTextField.getText().isEmpty()) {
@@ -37,7 +38,7 @@ public class AddClassTimeDialog extends CustomDialogSkin {
                     if (!startSlotComboBox.getSelectionModel().isEmpty()) {
                         if (!endSlotComboBox.getSelectionModel().isEmpty()) {
                             if (startSlotComboBox.getSelectionModel().getSelectedIndex() <= endSlotComboBox.getSelectionModel().getSelectedIndex()) {
-                                connectionHandler.sendClassTime(new ClassTime(0, classID, roomNumberTextField.getText(), dayOfWeekComboBox.getSelectionModel().getSelectedIndex(), startSlotComboBox.getSelectionModel().getSelectedIndex(), endSlotComboBox.getSelectionModel().getSelectedIndex()));
+                                connectionHandler.sendClassTime(new ClassTime(0, classID, roomNumberTextField.getText(), dayOfWeekComboBox.getSelectionModel().getSelectedIndex() + 1, startSlotComboBox.getSelectionModel().getSelectedIndex() + 1, endSlotComboBox.getSelectionModel().getSelectedIndex() + 1));
                                 closeAnimation();
                             } else {
                                 UserNotification.showErrorMessage("Add Class Time", "Start slot must be before end slot");

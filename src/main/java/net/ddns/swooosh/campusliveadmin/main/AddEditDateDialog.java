@@ -14,12 +14,14 @@ import models.all.ImportantDate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class AddEditDateDialog extends CustomDialogSkin {
 
     public AddEditDateDialog(Window parent, ConnectionHandler connectionHandler, ImportantDate importantDate) {
         initOwner(parent);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy - MM - dd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String heading;
         if (importantDate != null) {
             heading = "Edit Import Date";
@@ -37,11 +39,11 @@ public class AddEditDateDialog extends CustomDialogSkin {
             if (!descriptionTextField.getText().isEmpty()) {
                 if (datePicker.getValue() != null) {
                     if (importantDate != null) {
-                        if (!importantDate.getDescription().equals(descriptionTextField.getText()) || !importantDate.getDate().equals(dateFormat.format(datePicker.getValue()))) {
-                            connectionHandler.sendDate(new ImportantDate(importantDate.getId(), dateFormat.format(datePicker.getValue()), descriptionTextField.getText()));
+                        if (!importantDate.getDescription().equals(descriptionTextField.getText()) || !importantDate.getDate().equals(datePicker.getValue().format(dateTimeFormatter))) {
+                            connectionHandler.sendDate(new ImportantDate(importantDate.getId(), datePicker.getValue().format(dateTimeFormatter), descriptionTextField.getText()));
                         }
                     } else {
-                        connectionHandler.sendDate(new ImportantDate(-1, dateFormat.format(datePicker.getValue()), descriptionTextField.getText()));
+                        connectionHandler.sendDate(new ImportantDate(-1,  datePicker.getValue().format(dateTimeFormatter), descriptionTextField.getText()));
                     }
                     closeAnimation();
                 } else {

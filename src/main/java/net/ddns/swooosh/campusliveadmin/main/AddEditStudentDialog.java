@@ -45,21 +45,21 @@ public class AddEditStudentDialog extends CustomDialogSkin {
                 if (!firstNameTextField.getText().isEmpty() && firstNameTextField.getText().matches("[a-zA-Z ]*")) {
                     if (!lastNameTextField.getText().isEmpty() && lastNameTextField.getText().matches("[a-zA-Z ]*")) {
                         if (!qualificationComboBox.getSelectionModel().isEmpty()) {
-                            if (!emailTextField.getText().isEmpty() && emailTextField.getText().matches("^[a-z0-9](\\.?[a-z0-9]){5,}@gmail\\.com$")) {
-                                if (!contactNumberTextField.getText().isEmpty() && contactNumberTextField.getText().matches("[0-9 ]{12}")) {
+                            if (!emailTextField.getText().isEmpty() && Display.validEmail(emailTextField.getText())) {
+                                if (!contactNumberTextField.getNumber().isEmpty() && contactNumberTextField.getNumber().matches("[0-9 ]{12}")) {
                                     if (student != null) {
-                                        if (!student.getStudentNumber().equals(studentNumberTextField.getText()) || !student.getFirstName().equals(firstNameTextField.getText()) || !student.getLastName().equals(lastNameTextField.getText()) || !student.getQualification().equals(qualificationComboBox.getSelectionModel().getSelectedItem()) || !student.getEmail().equals(emailTextField.getText()) || !student.getContactNumber().equals(contactNumberTextField.getText())) {
-                                            connectionHandler.sendStudent(new Student(studentNumberTextField.getText(), qualificationComboBox.getSelectionModel().getSelectedItem(), firstNameTextField.getText(), lastNameTextField.getText(), emailTextField.getText(), contactNumberTextField.getText(), null));
+                                        if (!student.getStudentNumber().equals(studentNumberTextField.getText()) || !student.getFirstName().equals(firstNameTextField.getText()) || !student.getLastName().equals(lastNameTextField.getText()) || !student.getQualification().equals(qualificationComboBox.getSelectionModel().getSelectedItem()) || !student.getEmail().equals(emailTextField.getText()) || !student.getContactNumber().equals(contactNumberTextField.getNumber())) {
+                                            connectionHandler.sendStudent(new Student(studentNumberTextField.getText(), qualificationComboBox.getSelectionModel().getSelectedItem(), firstNameTextField.getText(), lastNameTextField.getText(), emailTextField.getText(), contactNumberTextField.getNumber(), null));
                                         }
                                     } else {
-                                        connectionHandler.sendStudent(new Student(studentNumberTextField.getText(), qualificationComboBox.getSelectionModel().getSelectedItem(), firstNameTextField.getText(), lastNameTextField.getText(), emailTextField.getText(), contactNumberTextField.getText(), null));
+                                        connectionHandler.sendStudent(new Student(studentNumberTextField.getText(), qualificationComboBox.getSelectionModel().getSelectedItem(), firstNameTextField.getText(), lastNameTextField.getText(), emailTextField.getText(), contactNumberTextField.getNumber(), null));
                                     }
                                     closeAnimation();
                                 } else {
                                     UserNotification.showErrorMessage(heading, "Invalid Contact Number");
                                 }
                             } else {
-                                UserNotification.showErrorMessage(heading, "Invalid Last Name");
+                                UserNotification.showErrorMessage(heading, "Invalid Email");
                             }
                         } else {
                             UserNotification.showErrorMessage(heading, "Select qualification");
