@@ -906,6 +906,9 @@ public class Display extends Application {
     }
 
     public static void main(String[] args) {
+        if (args.length == 1) {
+            ConnectionHandler.LOCAL_ADDRESS = args[0];
+        }
         launch(null);
     }
 }

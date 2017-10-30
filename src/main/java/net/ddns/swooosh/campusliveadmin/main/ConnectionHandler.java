@@ -16,7 +16,7 @@ import java.util.List;
 public class ConnectionHandler {
 
     private static final int PORT = 25760;
-    private static final String LOCAL_ADDRESS = "127.0.0.1"; //TODO
+    static String LOCAL_ADDRESS = "10.0.0.3"; //TODO
     private Socket socket;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
@@ -51,7 +51,7 @@ public class ConnectionHandler {
             System.out.println("Socket is connected");
         } catch (Exception ex) {
             ex.printStackTrace();
-            UserNotification.showErrorMessage("Connection error", "Could not connect to server!\nPlease check network connectivity and try again!");
+            UserNotification.showErrorMessage("Connection error", "Could not connect to server! (" + LOCAL_ADDRESS +")\nPlease check network connectivity and try again!");
             System.exit(0);
         }
     }
