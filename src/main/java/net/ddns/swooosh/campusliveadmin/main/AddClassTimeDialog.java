@@ -31,7 +31,7 @@ public class AddClassTimeDialog extends CustomDialogSkin {
         HBox selectPane = new HBox(startSlotComboBox, endSlotComboBox);
         selectPane.setSpacing(15);
         selectPane.setAlignment(Pos.CENTER);
-        Button actionButton = new Button("Edit");
+        Button actionButton = new Button("Add");
         actionButton.setOnAction(e -> {
             if (!roomNumberTextField.getText().isEmpty()) {
                 if (!dayOfWeekComboBox.getSelectionModel().isEmpty()) {

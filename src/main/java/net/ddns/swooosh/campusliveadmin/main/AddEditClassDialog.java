@@ -151,7 +151,7 @@ public class AddEditClassDialog extends CustomDialogSkin {
 
         Button actionButton = new Button();
         actionButton.setOnAction((ActionEvent e) -> {
-            if (!moduleNameTextField.getText().isEmpty() && moduleNameTextField.getText().matches("[a-zA-Z ]*")) {
+            if (!moduleNameTextField.getText().isEmpty() && moduleNameTextField.getText().matches("[a-zA-Z0-9 ]*")) {
                 if (!moduleNumberTextField.getText().isEmpty() && moduleNumberTextField.getText().matches("[A-Z0-9 ]*")) {
                     if (!lecturerComboBox.getSelectionModel().isEmpty()) {
                         if (!classResultTemplateTableView.getItems().isEmpty()) {

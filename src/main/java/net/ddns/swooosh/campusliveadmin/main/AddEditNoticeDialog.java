@@ -37,7 +37,7 @@ public class AddEditNoticeDialog extends CustomDialogSkin {
         descriptionTextField.setPromptText("Description");
         descriptionTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
         TextField tagTextField = new TextField();
-        tagTextField.setPromptText("Last Name");
+        tagTextField.setPromptText("Tag");
         tagTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
         DatePicker expiryDatePicker = new DatePicker();
         expiryDatePicker.setPromptText("Select expiry date");

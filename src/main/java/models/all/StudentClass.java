@@ -52,6 +52,6 @@ public class StudentClass implements Serializable {
     }
 
     public String getClassDetails() {
-        return "Class Id: " + classID + "\nModule Name: " + moduleName + "\nModule Number: " + moduleNumber + "\nLecturer: " + classLecturer.getFirstName() + " " + classLecturer.getFirstName() + " - " + classLecturer.getLecturerID();
+        return "Class Id: " + classID + "\nModule Name: " + moduleName + "\nModule Number: " + moduleNumber + "\nLecturer: " + classLecturer.getFirstName() + " - " + classLecturer.getLecturerID();
     }
 }
