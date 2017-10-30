@@ -64,6 +64,6 @@ public class ContactDetails implements Serializable {
     }
 
     public String getContactDetails() {
-        return "Name: " + name + "\nPosition: " + position + "\nDepartment: " + department + "\nEmail: " + contactNumber + "\nContact Number: " + contactNumber;
+        return "Name: " + name + "\nPosition: " + position + "\nDepartment: " + department + "\nEmail: " + email + "\nContact Number: " + contactNumber;
     }
 }
