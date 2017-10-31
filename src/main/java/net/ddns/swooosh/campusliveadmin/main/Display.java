@@ -33,6 +33,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class Display extends Application {
 
@@ -79,7 +81,7 @@ public class Display extends Application {
         });
         Button removeAdminButton = new Button("Remove");
         removeAdminButton.setOnAction(e -> {
-            if (!adminTableView.getSelectionModel().isEmpty()) {
+            if (!adminTableView.getSelectionModel().isEmpty() && !adminTableView.getSelectionModel().getSelectedItem().getAdminName().equals(connectionHandler.username)) {
                 connectionHandler.removeAdmin(adminTableView.getSelectionModel().getSelectedItem().getAdminName());
             }
         });
@@ -89,7 +91,7 @@ public class Display extends Application {
                 connectionHandler.resetAdminPassword(adminTableView.getSelectionModel().getSelectedItem().getAdminName(), adminTableView.getSelectionModel().getSelectedItem().getAdminEmail());
             }
         });
-        HBox adminButtonPane = new HBox(addAdminButton, editAdminButton, resetPasswordButton);
+        HBox adminButtonPane = new HBox(addAdminButton, editAdminButton, removeAdminButton, resetPasswordButton);
         adminButtonPane.setSpacing(10);
         adminButtonPane.setAlignment(Pos.CENTER);
         VBox adminPane = new VBox(adminTableView, adminFillPane, adminButtonPane);
@@ -190,7 +192,11 @@ public class Display extends Application {
         TableColumn<Result, String> studentResultTableColumn = new TableColumn<>("Result");
         studentResultTableColumn.setCellValueFactory(p -> {
             if (p.getValue() != null) {
-                return new SimpleStringProperty(String.format("%.0f / %.0f", p.getValue().getResult(), p.getValue().getResultMax()));
+                if (p.getValue().getResult() == -1D) {
+                    return new SimpleStringProperty(String.format("N/A / %.0f", p.getValue().getResultMax()));
+                } else {
+                    return new SimpleStringProperty(String.format("%.0f / %.0f", p.getValue().getResult(), p.getValue().getResultMax()));
+                }
             } else {
                 return new SimpleStringProperty("");
             }
@@ -631,7 +637,21 @@ public class Display extends Application {
         TableColumn<Notice, String> noticeTagTableColumn = new TableColumn<>("Tag");
         noticeTagTableColumn.setCellValueFactory(new PropertyValueFactory<>("tag"));
         TableColumn<Notice, String> noticeExpiryTableColumn = new TableColumn<>("ExpiryDate");
-        noticeExpiryTableColumn.setCellValueFactory(new PropertyValueFactory<>("expiryDate"));
+        noticeExpiryTableColumn.setCellValueFactory(item -> {
+                    if (item != null) {
+                        try {
+                            if (new SimpleDateFormat("yyyy-MM-dd").parse(item.getValue().getExpiryDate()).compareTo(Calendar.getInstance().getTime()) >= 0) {
+                                return new SimpleStringProperty(item.getValue().getExpiryDate());
+                            } else {
+                                return new SimpleStringProperty(item.getValue().getExpiryDate() + " (Expired)");
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    return new SimpleStringProperty("");
+                }
+        );
         noticeTableView.getColumns().addAll(noticeIDTableColumn, noticeHeadingTableColumn, noticeDescriptionTableColumn, noticeTagTableColumn, noticeExpiryTableColumn);
         connectionHandler.notices.addListener((InvalidationListener) e -> {
             noticeTableView.setItems(connectionHandler.notices);

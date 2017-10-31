@@ -41,7 +41,7 @@ public class AddEditStudentDialog extends CustomDialogSkin {
         ContactNumberTextField contactNumberTextField = new ContactNumberTextField("Contact Number");
         Button actionButton = new Button();
         actionButton.setOnAction(e -> {
-            if (studentNumberTextField.getText().length() >= 5 && studentNumberTextField.getText().matches("[A-Z]{2}[0-9]{4}-[0-9]{4}")) {
+            if (studentNumberTextField.getText().length() >= 5 && studentNumberTextField.getText().matches("[A-Z]{2}20[0-9]{2}-[0-9]{4}")) {
                 if (!firstNameTextField.getText().isEmpty() && firstNameTextField.getText().matches("[a-zA-Z ]*")) {
                     if (!lastNameTextField.getText().isEmpty() && lastNameTextField.getText().matches("[a-zA-Z ]*")) {
                         if (!qualificationComboBox.getSelectionModel().isEmpty()) {

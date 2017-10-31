@@ -27,24 +27,24 @@ public class AddEditNotificationDialog extends CustomDialogSkin {
         TextField descriptionTextField = new TextField();
         descriptionTextField.setPromptText("Description");
         descriptionTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
-        TextField tagTextField = new TextField();
-        tagTextField.setPromptText("Tag");
-        tagTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
+        TextField studentNumberTextField = new TextField();
+        studentNumberTextField.setPromptText("Student Number");
+        studentNumberTextField.setStyle("-fx-prompt-text-fill: derive(-fx-control-inner-background, -45%);");
         Button actionButton = new Button();
         actionButton.setOnAction(e -> {
             if (!headingTextField.getText().isEmpty()) {
                 if (!descriptionTextField.getText().isEmpty()) {
-                    if (!tagTextField.getText().isEmpty()) {
+                    if (!studentNumberTextField.getText().isEmpty() && studentNumberTextField.getText().matches("[A-Z]{2}20[0-9]{2}-[0-9]{4}")) {
                         if (notification != null) {
-                            if (!notification.getHeading().equals(headingTextField.getText()) || !notification.getDescription().equals(descriptionTextField.getText()) || !notification.getTag().equals(tagTextField.getText())) {
-                                connectionHandler.sendNotification(new Notification(notification.getId(), headingTextField.getText(), descriptionTextField.getText(), tagTextField.getText()));
+                            if (!notification.getHeading().equals(headingTextField.getText()) || !notification.getDescription().equals(descriptionTextField.getText()) || !notification.getTag().equals(studentNumberTextField.getText())) {
+                                connectionHandler.sendNotification(new Notification(notification.getId(), headingTextField.getText(), descriptionTextField.getText(), studentNumberTextField.getText()));
                             }
                         } else {
-                            connectionHandler.sendNotification(new Notification(-1, headingTextField.getText(), descriptionTextField.getText(), tagTextField.getText()));
+                            connectionHandler.sendNotification(new Notification(-1, headingTextField.getText(), descriptionTextField.getText(), studentNumberTextField.getText()));
                         }
                         closeAnimation();
                     } else {
-                        UserNotification.showErrorMessage(heading, "Invalid Tag");
+                        UserNotification.showErrorMessage(heading, "Invalid Student Number");
                     }
                 } else {
                     UserNotification.showErrorMessage(heading, "Invalid Description");
@@ -62,11 +62,11 @@ public class AddEditNotificationDialog extends CustomDialogSkin {
             actionButton.setText("Edit");
             headingText.setText(notification.getHeading());
             descriptionTextField.setText(notification.getDescription());
-            tagTextField.setText(notification.getTag());
+            studentNumberTextField.setText(notification.getTag());
         } else {
             actionButton.setText("Add");
         }
-        VBox innerPane = new VBox(headingText, headingTextField, descriptionTextField, tagTextField, buttonPane);
+        VBox innerPane = new VBox(headingText, headingTextField, descriptionTextField, studentNumberTextField, buttonPane);
         innerPane.setPadding(new Insets(20, 50, 20, 50));
         innerPane.setSpacing(20);
         innerPane.setMinWidth(600);

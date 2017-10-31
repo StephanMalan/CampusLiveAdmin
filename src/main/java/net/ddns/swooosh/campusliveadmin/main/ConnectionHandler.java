@@ -9,6 +9,7 @@ import models.all.*;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,8 @@ import java.util.List;
 public class ConnectionHandler {
 
     private static final int PORT = 25760;
-    static String LOCAL_ADDRESS = "10.0.0.3"; //TODO
+    static String LOCAL_ADDRESS = "127.0.0.1"; //TODO
+    String username;
     private Socket socket;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
@@ -45,7 +47,8 @@ public class ConnectionHandler {
         try {
             System.out.println("Trying to connect to server...");
             System.setProperty("javax.net.ssl.trustStore", Display.APPLICATION_FOLDER + "/campuslive.store");
-            socket = SSLSocketFactory.getDefault().createSocket(LOCAL_ADDRESS, PORT);
+            socket = SSLSocketFactory.getDefault().createSocket();
+            socket.connect(new InetSocketAddress(LOCAL_ADDRESS, PORT), 1000);
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             objectInputStream = new ObjectInputStream(socket.getInputStream());
             System.out.println("Socket is connected");
@@ -58,6 +61,7 @@ public class ConnectionHandler {
 
     public Boolean login(String username, String password) {
         sendData("aa:" + username + ":" + password);
+        this.username = username;
         return getStringReply("aa:");
     }
 
@@ -138,7 +142,7 @@ public class ConnectionHandler {
     }
 
     void removeAdmin(String username) {
-        sendData("rm" + username);
+        sendData("rm:" + username);
     }
 
     void sendStudent(Student student) {
@@ -307,20 +311,29 @@ public class ConnectionHandler {
                             }
                         } else if (!list.isEmpty() && list.get(0) instanceof Admin) {
                             admins.clear();
-                            admins.addAll(list);
+                            if (!((Admin) list.get(0)).getAdminName().equals("NoAdmin")) {
+                                admins.addAll(list);
+                            }
                         } else if (!list.isEmpty() && list.get(0) instanceof Notice) {
                             notices.clear();
-                            notices.addAll(list);
+                            if (!((Notice) list.get(0)).getHeading().equals("NoNotice")) {
+                                notices.addAll(list);
+                            }
                         } else if (!list.isEmpty() && list.get(0) instanceof Notification) {
                             notifications.clear();
-                            notifications.addAll(list);
+                            if (!((Notification) list.get(0)).getHeading().equals("NoNotification")) {
+                                notifications.addAll(list);
+                            }
                         } else if (!list.isEmpty() && list.get(0) instanceof ImportantDate) {
-                            System.out.println(1);
                             importantDates.clear();
-                            importantDates.addAll(list);
+                            if (!((ImportantDate) list.get(0)).getDate().equals("NoImportantDate")) {
+                                importantDates.addAll(list);
+                            }
                         } else if (!list.isEmpty() && list.get(0) instanceof StudentClass) {
                             classes.clear();
-                            classes.addAll(list);
+                            if (((StudentClass) list.get(0)).getClassID() != -1) {
+                                classes.addAll(list);
+                            }
                         }
                     } else if (input instanceof String) {
                         inputQueue.add((String) input);
