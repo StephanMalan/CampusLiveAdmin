@@ -114,6 +114,7 @@ public class Display extends Application {
         studentSearchPane.searchListView.getSelectionModel().selectedItemProperty().addListener(e -> {
             if (studentSearchPane.searchListView.getSelectionModel().getSelectedItem() != null) {
                 connectionHandler.requestStudent(studentSearchPane.searchListView.getSelectionModel().getSelectedItem().getSecondaryText());
+                studentSearchPane.searchListView.getFocusModel().focus(studentSearchPane.searchListView.getSelectionModel().getSelectedIndex());
             } else {
                 connectionHandler.student.setStudent(null);
             }
@@ -203,12 +204,7 @@ public class Display extends Application {
         });
         studentResultTableView.getColumns().addAll(studentResultNameTableColumn, studentResultTableColumn);
         studentResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        studentClassListView.getSelectionModel().selectedItemProperty().addListener(e -> {
-            studentResultTableView.getItems().clear();
-            if (studentClassListView.getSelectionModel().getSelectedItem() != null) {
-                studentResultTableView.getItems().addAll(studentClassListView.getSelectionModel().getSelectedItem().getResults());
-            }
-        });
+
         Button editResultButton = new Button("Edit");
         editResultButton.setOnAction(e -> {
             if (!studentResultTableView.getSelectionModel().isEmpty()) {
@@ -218,7 +214,18 @@ public class Display extends Application {
         Button regSuppExamButton = new Button("Reg Supp Exam");
         regSuppExamButton.setOnAction(e -> {
             if (connectionHandler.student.getStudent() != null && !studentClassListView.getSelectionModel().isEmpty()) {
-                connectionHandler.regSuppExam(connectionHandler.student.getStudent().getStudentNumber(), studentClassListView.getSelectionModel().getSelectedItem().getStudentClass().getClassID());
+                Boolean alreadyRegistered = false;
+                Boolean hasInitialExam = false;
+                for (Result result : studentResultTableView.getItems()) {
+                    if (result.getResultName().equals("Supplementary Exam")) {
+                        alreadyRegistered = true;
+                    } else if (result.getResultName().equals("Initial Exam")) {
+                        hasInitialExam = true;
+                    }
+                }
+                if (!alreadyRegistered && hasInitialExam) {
+                    connectionHandler.regSuppExam(connectionHandler.student.getStudent().getStudentNumber(), studentClassListView.getSelectionModel().getSelectedItem().getStudentClass().getClassID());
+                }
             }
         });
         HBox studentResultButtonPane = new HBox(editResultButton, regSuppExamButton);
@@ -252,10 +259,14 @@ public class Display extends Application {
         });
         studentAttendanceTableView.getColumns().addAll(studentAttendanceDateTableColumn, studentAttendanceTableColumn);
         studentAttendanceTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final ClassResultAttendance[] prevStudentClassValue = new ClassResultAttendance[1];
         studentClassListView.getSelectionModel().selectedItemProperty().addListener(e -> {
             studentAttendanceTableView.getItems().clear();
+            studentResultTableView.getItems().clear();
             if (studentClassListView.getSelectionModel().getSelectedItem() != null) {
                 studentAttendanceTableView.getItems().addAll(studentClassListView.getSelectionModel().getSelectedItem().getAttendance());
+                studentResultTableView.getItems().addAll(studentClassListView.getSelectionModel().getSelectedItem().getResults());
+                prevStudentClassValue[0] = studentClassListView.getSelectionModel().getSelectedItem();
             }
         });
         Button editAttendanceButton = new Button("Edit");
@@ -295,6 +306,12 @@ public class Display extends Application {
                     if (connectionHandler.student.getStudent() != null) {
                         studentInfoTextArea.setText(connectionHandler.student.getStudent().getStudentInformation());
                         studentClassListView.setItems(FXCollections.observableArrayList(connectionHandler.student.getStudent().getClassResultAttendances()));
+                        for (int j = 0; j < studentClassListView.getItems().size(); j++) {
+                            if (prevStudentClassValue[0] != null && studentClassListView.getItems().get(j).getStudentClass().getClassID() == prevStudentClassValue[0].getStudentClass().getClassID()) {
+                                studentClassListView.getSelectionModel().select(j);
+                                studentClassListView.getFocusModel().focus(j);
+                            }
+                        }
                     } else {
                         studentInfoTextArea.setText("Please select student");
                     }

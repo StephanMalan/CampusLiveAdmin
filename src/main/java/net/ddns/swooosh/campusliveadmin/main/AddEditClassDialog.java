@@ -110,8 +110,11 @@ public class AddEditClassDialog extends CustomDialogSkin {
         ComboBox<String> resultNameComboBox = new ComboBox<>(FXCollections.observableArrayList("Semester Test", "Assignment", "Project", "Cont Assessment", "Initial Exam", "Supplementary Exam"));
         resultNameComboBox.setPromptText("Result Name");
         NumberTextField resultMaxTextField = new NumberTextField("Result Max");
+        resultMaxTextField.setMaxWidth(100);
         NumberTextField dpWeightTextField = new NumberTextField("DP Weight");
+        dpWeightTextField.setMaxWidth(100);
         NumberTextField finalWeightTextField = new NumberTextField("Final Weight");
+        finalWeightTextField.setMaxWidth(100);
         resultNameComboBox.getSelectionModel().selectedItemProperty().addListener(e -> {
             if (!resultNameComboBox.getSelectionModel().isEmpty()) {
                 if (resultNameComboBox.getSelectionModel().getSelectedItem().equals("Initial Exam") || resultNameComboBox.getSelectionModel().getSelectedItem().equals("Supplementary Exam")) {
@@ -211,8 +214,8 @@ public class AddEditClassDialog extends CustomDialogSkin {
         }
         innerPane.setPadding(new Insets(20, 50, 20, 50));
         innerPane.setSpacing(20);
-        innerPane.setMinWidth(800);
-        innerPane.setMaxWidth(800);
+        innerPane.setMinWidth(1000);
+        innerPane.setMaxWidth(1000);
         innerPane.setAlignment(Pos.CENTER);
         innerPane.setStyle("-fx-background-color: #ffffff;" +
                 "-fx-border-color: black;" +
@@ -221,7 +224,7 @@ public class AddEditClassDialog extends CustomDialogSkin {
                 "-fx-border-radius: 15;");
         VBox contentPane = new VBox(innerPane);
         contentPane.setAlignment(Pos.CENTER);
-        setWidth(800);
+        setWidth(1000);
         getDialogPane().setContent(contentPane);
     }
 

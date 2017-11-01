@@ -35,7 +35,7 @@ public class EditResultDialog extends CustomDialogSkin {
         if (result.getResult() == -1D) {
             noResultCheckBox.setSelected(true);
         } else {
-            resultTextField.setText(result.getResult() + "");
+            resultTextField.setText(((int) result.getResult()) + "");
         }
         Button actionButton = new Button("Edit");
         actionButton.setOnAction(e -> {

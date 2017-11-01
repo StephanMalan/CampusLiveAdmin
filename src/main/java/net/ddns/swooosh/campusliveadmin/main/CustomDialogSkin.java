@@ -34,7 +34,6 @@ public class CustomDialogSkin extends Dialog<Integer> {
 
     public int showDialog() {
         setX((getOwner().getWidth() / 2) - (width / 2));
-        System.out.println(getX());
         setY((getOwner().getHeight() / 2) - (getHeight() / 2));
         openAnimation();
         showAndWait();

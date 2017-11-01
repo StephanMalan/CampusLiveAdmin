@@ -17,7 +17,7 @@ import java.util.List;
 
 public class AddClassDialog extends CustomDialogSkin {
 
-    public AddClassDialog(Window parent, ConnectionHandler connectionHandler, String studentNumber, List<ClassResultAttendance> classResultAttendances) {
+    public AddClassDialog(Window parent, ConnectionHandler connectionHandler, String studentNumber, String department, List<ClassResultAttendance> classResultAttendances) {
         initOwner(parent);
         Label classLabel = new Label("Select class to register to from dropdown");
         ObservableList<StudentClass> classes = connectionHandler.getAllClasses();

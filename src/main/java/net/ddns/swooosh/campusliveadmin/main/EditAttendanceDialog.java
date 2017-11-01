@@ -47,6 +47,7 @@ public class EditAttendanceDialog extends CustomDialogSkin {
                 if (!attendance.getAttendance().equals(attendanceString)) {
                     attendance.setAttendance(attendanceString);
                     connectionHandler.sendAttendance(attendance);
+                    closeAnimation();
                 }
             } else {
                 UserNotification.showErrorMessage("Edit Attendance", "Please select attendance");
